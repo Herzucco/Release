@@ -8,6 +8,9 @@ public enum CellColor{
 }
 public class GridGenerator : BaseObject {
 	[Header("The Grid Generator general settings")]
+	[Tooltip("Grid Intelligence Prefab")]
+	public GameObject GridIntelligencePrefab;
+
 	[Tooltip("The time to wait before starting the grid generation")]
 	public float timeBeforeGeneration;
 	
@@ -150,7 +153,8 @@ public class GridGenerator : BaseObject {
 	}
 
 	protected virtual void AddIntelligence(List<Cell> cells, List<Columns> columns){
-		GridIntelligence intelligence = gameObject.AddComponent<GridIntelligence> ();
+		GameObject o = Instantiate<GameObject> (GridIntelligencePrefab);
+		GridIntelligence intelligence = o.GetComponent<GridIntelligence> ();
 		intelligence.cells = cells;
 		intelligence.whiteCells = whiteCells;
 		intelligence.blackCells = blackCells;

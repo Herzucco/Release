@@ -3,19 +3,51 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class GridIntelligence : BaseObject {
-	public int[] moveForceOne;
-	public int[] moveForceTwo;
-	public int[] moveForceThree;
-	public int[][] movePossibilities;
-	
-	public int numberOfColumns;
-	public int numberOfRows;
-	public List<Cell> cells;
-	public List<Cell> whiteCells;
-	public List<Cell> blackCells;
-	public List<Columns> columns;
+	[Tooltip("The settings used for the pawns")]
+	public PawnSettings pawnSettings;
 
+	[HideInInspector]
+	public int[] moveForceOne;
+	[HideInInspector]
+	public int[] moveForceTwo;
+	[HideInInspector]
+	public int[] moveForceThree;
+	[HideInInspector]
+	public int[][] movePossibilities;
+
+	[HideInInspector]
+	public int numberOfColumns;
+	[HideInInspector]
+	public int numberOfRows;
+	[HideInInspector]
+	public List<Cell> cells;
+	[HideInInspector]
+	public List<Cell> whiteCells;
+	[HideInInspector]
+	public List<Cell> blackCells;
+	[HideInInspector]
+	public List<Columns> columns;
+	
 	private List<Cell> _cellsForMove = new List<Cell>();
+
+	protected override void Start (){
+		base.Start ();
+		StartCoroutine (GeneratePawns ());
+	}
+	
+	public IEnumerator GeneratePawns (){
+		for (int i = 0; i < pawnSettings.whiteStartPositions.Length; i++) {
+			if(pawnSettings.whiteStartPositions[i]){
+				GeneratePawn(CellColor.WHITE, new Vector2(i,1));
+				yield return new WaitForSeconds(pawnSettings.spawnApparitionInterval);
+			}
+		}
+	}
+	
+	public void GeneratePawn(CellColor color, Vector2 position){
+		Debug.Log ("toto " + color.ToString() + " " + position.ToString());
+	}
+
 	public virtual void Setup(){
 		moveForceOne = new int[4] {1, -numberOfRows/2, numberOfRows/2, -1};
 		moveForceTwo = new int[12] {1, 2, -numberOfRows/2, -numberOfRows, numberOfRows/2, numberOfRows,
