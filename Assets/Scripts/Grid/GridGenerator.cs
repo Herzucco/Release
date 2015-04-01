@@ -46,6 +46,8 @@ public class GridGenerator : BaseObject {
 	public CellSettings cellSettings;
 	
 	protected CellColor currentCellColor;
+	protected List<Cell> whiteCells = new List<Cell>();
+	protected List<Cell> blackCells = new List<Cell>();
 
 	protected override void Start (){
 		base.Start ();
@@ -87,18 +89,27 @@ public class GridGenerator : BaseObject {
 
 		Cell toReturn = (currentCellColor == CellColor.BLACK) ? GenerateBlackCell(go, sprite) : GenerateWhiteCell(go,sprite);
 		toReturn.Prepare (cellSettings);
+		toReturn.index = x *  numberOfYCells + y;
 
 		return toReturn;
 	}
 
 	protected virtual Cell GenerateBlackCell(GameObject go, SpriteRenderer sRenderer){
 		sRenderer.sprite = blackCellSprite;
-		return go.AddComponent<BlackCell> ();
+		Cell cellComponent = go.AddComponent<BlackCell> ();
+		whiteCells.Add (cellComponent);
+		cellComponent.colorIndex = whiteCells.Count - 1;
+
+		return cellComponent;
 	}
 
 	protected virtual Cell GenerateWhiteCell(GameObject go, SpriteRenderer sRenderer){
 		sRenderer.sprite = whiteCellSprite;
-		return go.AddComponent<WhiteCell> ();
+		Cell cellComponent = go.AddComponent<WhiteCell> ();
+		blackCells.Add (cellComponent);
+		cellComponent.colorIndex = blackCells.Count - 1;
+
+		return cellComponent;
 	}
 
 	protected virtual IEnumerator AnimateCells(List<Cell> cells){
@@ -126,11 +137,27 @@ public class GridGenerator : BaseObject {
 
 			direction *= -1;
 		}
+
+		yield return WaitForSeconds (1f);
+
+		//test
+		int testIndex = 0;
+		cells [testIndex].ChangeColor (Color.red);
+		List<Cell> computedCells = FindObjectOfType<GridIntelligence>().GetCellsAtIndexForMove (3, testIndex);
+		for(int i = 0; i < computedCells.Count; i++){
+			computedCells[i].ChangeColor(Color.green);
+		}
 	}
 
 	protected virtual void AddIntelligence(List<Cell> cells, List<Columns> columns){
 		GridIntelligence intelligence = gameObject.AddComponent<GridIntelligence> ();
 		intelligence.cells = cells;
+		intelligence.whiteCells = whiteCells;
+		intelligence.blackCells = blackCells;
+
 		intelligence.columns = columns;
+		intelligence.numberOfRows = numberOfYCells;
+		intelligence.numberOfColumns = numberOfXCells;
+		intelligence.Setup ();
 	}
 }

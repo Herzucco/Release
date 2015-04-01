@@ -3,10 +3,13 @@ using System.Collections;
 using DG.Tweening;
 
 public class Cell : BaseObject {
+	public int index;
+	public int colorIndex;
 	public Columns column;
 
-	protected Vector2 _basePosition;
-	protected Vector2 _baseScale;
+	public Vector2 basePosition;
+	public Vector2 baseScale;
+
 	protected SpriteRenderer sRenderer;
 	protected CircleCollider2D cCollider;
 	protected CellSettings settings;
@@ -18,14 +21,14 @@ public class Cell : BaseObject {
 		sRenderer.enabled = false;
 		cCollider.enabled = false;
 
-		_basePosition = transform.position;
-		_baseScale = transform.localScale;
+		basePosition = transform.position;
+		baseScale = transform.localScale;
 	}
 
 	public virtual void Prepare(CellSettings s){
 		settings = s;
 
-		transform.position = _basePosition + settings.fallFromPosition;
+		transform.position = basePosition + settings.fallFromPosition;
 		transform.localScale = settings.scaleBeforeAnimation;
 	}
 
@@ -34,9 +37,13 @@ public class Cell : BaseObject {
 		cCollider.enabled = true;
 
 		//do fall
-		transform.DOMove (_basePosition, settings.fallAnimationDuration, false).SetEase (settings.fallAnimationEase);
+		transform.DOMove (basePosition, settings.fallAnimationDuration, false).SetEase (settings.fallAnimationEase);
 
 		//do fall
-		transform.DOScale (_baseScale, settings.scaleAnimationDuration).SetEase (settings.scaleAnimationEase);
+		transform.DOScale (baseScale, settings.scaleAnimationDuration).SetEase (settings.scaleAnimationEase);
+	}
+
+	public virtual void ChangeColor(Color color){
+		sRenderer.color = color;
 	}
 }
