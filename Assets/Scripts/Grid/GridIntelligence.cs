@@ -76,7 +76,6 @@ public class GridIntelligence : BaseObject {
 		pTrans.localScale = settings.beforeApparitionScale;
 		pTrans.DOScale (_baseScale, settings.scaleApparitionAnimationDuration);
 		//pawn
-		Debug.Log ("toto " + color.ToString() + " " + position.ToString());
 	}
 
 	public virtual void Setup(){

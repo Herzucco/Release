@@ -115,7 +115,7 @@ public class GridGenerator : BaseObject {
 	}
 
 	protected virtual IEnumerator AnimateCells(List<Cell> cells, List<Columns> columns){
-		int direction = 1;
+		int direction = (shouldStartAtEnd) ? 1 : -1;
 
 		for(int i = numberOfYCells; i > 0; i--){
 
