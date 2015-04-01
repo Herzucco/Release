@@ -105,16 +105,19 @@ public class GridGenerator : BaseObject {
 		int direction = 1;
 
 		for(int i = numberOfYCells; i > 0; i--){
-			timeToInstanciateCellCurve.UpdateValue(1f);
 
 			if(direction == 1){
 				for(int u = 0; u < numberOfXCells; u++){
+					timeToInstanciateCellCurve.UpdateValue(1f);
+
 					Cell cell = cells[i-1 + (numberOfYCells * u)];
 					cell.Animate();
 					yield return WaitForSeconds(timeToInstanciateCellCurve.currentValue);
 				}
 			}else{
 				for(int u = numberOfXCells-1; u >= 0 ; u--){
+					timeToInstanciateCellCurve.UpdateValue(1f);
+
 					Cell cell = cells[i-1 + (numberOfYCells * u)];
 					cell.Animate();
 					yield return WaitForSeconds(timeToInstanciateCellCurve.currentValue);
