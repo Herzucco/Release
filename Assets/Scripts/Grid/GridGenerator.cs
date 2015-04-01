@@ -26,6 +26,9 @@ public class GridGenerator : BaseObject {
 	[Tooltip("The power attributed on columns, ruled by a curve")]
 	public SimpleCurveHandler powerColumnsCurve;
 
+	[Tooltip("Define if the cell start animation should start from end or begining")]
+	public bool shouldStartAtEnd = true;
+
 	[Header("Cells Settings")]
 	[Tooltip("The scale size of each cell - will define positionning too")]
 	public Vector2 cellScaleSize;
@@ -39,7 +42,9 @@ public class GridGenerator : BaseObject {
 	[Tooltip("Sprite for the black cells")]
 	public Sprite blackCellSprite;
 
-	protected List<Columns> columns = new List<Columns>();
+	[Tooltip("The settings injected into the cells")]
+	public CellSettings cellSettings;
+	
 	protected CellColor currentCellColor;
 
 	protected override void Start (){
@@ -53,6 +58,7 @@ public class GridGenerator : BaseObject {
 		yield return WaitForSeconds (timeBeforeGeneration);
 
 		List<Cell> cells = new List<Cell> ();
+		List<Columns> columns = new List<Columns>();
 
 		for(int i = 0; i < numberOfXCells; i++){
 			int currentPower = (int) powerColumnsCurve.Evaluate(i);
@@ -66,6 +72,9 @@ public class GridGenerator : BaseObject {
 				currentCellColor = (currentCellColor == CellColor.BLACK) ? CellColor.WHITE : CellColor.BLACK;
 			}
 		}
+
+		StartCoroutine(AnimateCells (cells));
+		AddIntelligence (cells, columns);
 	}
 
 	protected virtual Cell GenerateCell(int x, int y){
@@ -76,7 +85,10 @@ public class GridGenerator : BaseObject {
 		go.AddComponent<CircleCollider2D> ();
 		SpriteRenderer sprite = go.AddComponent<SpriteRenderer> ();
 
-		return (currentCellColor == CellColor.BLACK) ? GenerateBlackCell(go, sprite) : GenerateWhiteCell(go,sprite);
+		Cell toReturn = (currentCellColor == CellColor.BLACK) ? GenerateBlackCell(go, sprite) : GenerateWhiteCell(go,sprite);
+		toReturn.Prepare (cellSettings);
+
+		return toReturn;
 	}
 
 	protected virtual Cell GenerateBlackCell(GameObject go, SpriteRenderer sRenderer){
@@ -87,5 +99,35 @@ public class GridGenerator : BaseObject {
 	protected virtual Cell GenerateWhiteCell(GameObject go, SpriteRenderer sRenderer){
 		sRenderer.sprite = whiteCellSprite;
 		return go.AddComponent<WhiteCell> ();
+	}
+
+	protected virtual IEnumerator AnimateCells(List<Cell> cells){
+		int direction = 1;
+
+		for(int i = numberOfYCells; i > 0; i--){
+			timeToInstanciateCellCurve.UpdateValue(1f);
+
+			if(direction == 1){
+				for(int u = 0; u < numberOfXCells; u++){
+					Cell cell = cells[i-1 + (numberOfYCells * u)];
+					cell.Animate();
+					yield return WaitForSeconds(timeToInstanciateCellCurve.currentValue);
+				}
+			}else{
+				for(int u = numberOfXCells-1; u >= 0 ; u--){
+					Cell cell = cells[i-1 + (numberOfYCells * u)];
+					cell.Animate();
+					yield return WaitForSeconds(timeToInstanciateCellCurve.currentValue);
+				}
+			}
+
+			direction *= -1;
+		}
+	}
+
+	protected virtual void AddIntelligence(List<Cell> cells, List<Columns> columns){
+		GridIntelligence intelligence = gameObject.AddComponent<GridIntelligence> ();
+		intelligence.cells = cells;
+		intelligence.columns = columns;
 	}
 }
