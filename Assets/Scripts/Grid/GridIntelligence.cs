@@ -35,6 +35,7 @@ public class GridIntelligence : BaseObject {
 	public List<Columns> columns;
 	
 	private List<Cell> _cellsForMove = new List<Cell>();
+	private List<Pawn> _pawns = new List<Pawn>();
 
 	protected override void Start (){
 		base.Start ();
@@ -75,8 +76,9 @@ public class GridIntelligence : BaseObject {
 		Vector3 _baseScale = pTrans.localScale;
 		pTrans.localScale = settings.beforeApparitionScale;
 		pTrans.DOScale (_baseScale, settings.scaleApparitionAnimationDuration);
-		//pawn
-		Debug.Log ("toto " + color.ToString() + " " + position.ToString());
+		p.cellPos.x = position.x;
+		p.cellPos.y = position.y;
+		_pawns.Add (p);
 	}
 
 	public virtual void Setup(){
