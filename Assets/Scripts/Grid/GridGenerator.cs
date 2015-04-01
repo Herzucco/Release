@@ -9,7 +9,7 @@ public enum CellColor{
 public class GridGenerator : BaseObject {
 	[Header("The Grid Generator general settings")]
 	[Tooltip("Grid Intelligence Prefab")]
-	public GameObject GridIntelligencePrefab;
+	public GridIntelligenceSettings gridIntelligenceSettings;
 
 	[Tooltip("The time to wait before starting the grid generation")]
 	public float timeBeforeGeneration;
@@ -76,8 +76,7 @@ public class GridGenerator : BaseObject {
 			}
 		}
 
-		StartCoroutine(AnimateCells (cells));
-		AddIntelligence (cells, columns);
+		StartCoroutine(AnimateCells (cells, columns));
 	}
 
 	protected virtual Cell GenerateCell(int x, int y){
@@ -104,7 +103,7 @@ public class GridGenerator : BaseObject {
 		return go.AddComponent<WhiteCell> ();
 	}
 
-	protected virtual IEnumerator AnimateCells(List<Cell> cells){
+	protected virtual IEnumerator AnimateCells(List<Cell> cells, List<Columns> columns){
 		int direction = 1;
 
 		for(int i = numberOfYCells; i > 0; i--){
@@ -129,12 +128,17 @@ public class GridGenerator : BaseObject {
 
 			direction *= -1;
 		}
+		
+		AddIntelligence (cells, columns);
 	}
 
 	protected virtual void AddIntelligence(List<Cell> cells, List<Columns> columns){
-		GameObject o = Instantiate<GameObject> (GridIntelligencePrefab);
-		GridIntelligence intelligence = o.GetComponent<GridIntelligence> ();
+		GameObject o = new GameObject ("_GridIntelligence");
+		GridIntelligence intelligence = o.AddComponent<GridIntelligence> ();
 		intelligence.cells = cells;
 		intelligence.columns = columns;
+		intelligence.settings = gridIntelligenceSettings;
+		intelligence.posByScale = Vector3.one * (cellScaleSize.x + offsetBetweenCell);
+		o.GetComponent<Transform> ().position = GetComponent<Transform> ().position;
 	}
 }
