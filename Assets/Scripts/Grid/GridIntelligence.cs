@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using DG.Tweening;
 
 public class GridIntelligence : BaseObject {
-	public List<Cell> cells;
-	public List<Columns> columns;
 
 	public Vector3 posByScale;
 
